@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
 
-def plot_evolution(rewards: list, pack_size: int):
+def plot_evolution(rewards: list, pack_size: int, game_name: str):
     to_plot = []
     mean = 0
     for i, reward in enumerate(rewards):
@@ -14,5 +14,5 @@ def plot_evolution(rewards: list, pack_size: int):
     plt.axis((0, len(to_plot), -25, 50))
     plt.xlabel(f"Pack de {pack_size} episódios")
     plt.ylabel("Score")
-    plt.title("Treino de DRL para lançamento oblíquo")
+    plt.title(f"{game_name} DRL para lançamento oblíquo")
     plt.show()
