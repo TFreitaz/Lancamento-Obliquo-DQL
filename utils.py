@@ -16,3 +16,11 @@ def plot_evolution(rewards: list, pack_size: int, game_name: str):
     plt.ylabel("Score")
     plt.title(f"{game_name} DRL para lançamento oblíquo")
     plt.show()
+
+
+def get_config(item: str, default, func=None, conf: dict = {}):
+    if item in conf:
+        if func:
+            return func(conf[item])
+        return conf[item]
+    return default
