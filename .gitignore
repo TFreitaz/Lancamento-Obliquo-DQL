@@ -136,3 +136,10 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+# Data
+.data/
+.grid_data
+*.json
+*.png
+*.csv
