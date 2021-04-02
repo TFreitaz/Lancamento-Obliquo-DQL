@@ -19,15 +19,16 @@ env_settings: Dict[str, Union[int, str]] = {
     "vel_disc": 100,  # número de pontos de dicretização da velocidade de lancamento
     "max_dist": 50,  # máxima distancia possivel para o alvo
     "target_len": "random",  # comprimento do alvo, isto e, tolerância absoluta para sucesso
+    "diameter": "random",  # diâmetro do projétil
 }
 
-n_states = 2
+n_states = 3
 
 n_episodes = 1000  # número de episodios a serem executados
 decay = 0.021  # decaimento da taxa de aleatoriedade
 
 agent_settings: Dict[str, int] = {
-    "num_states": 2,  # número de parâmetros de um estado = (distancia)
+    "num_states": n_states,  # número de parâmetros de um estado = (distancia)
     "gamma": 0,  # incremento por ações futuras
     "min_experiences": 0,  # mínimo de experiências aleatórias
     "max_experiences": 500,  # máximo de experiências aleatórias
