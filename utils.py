@@ -1,4 +1,17 @@
+import socket
 import matplotlib.pyplot as plt
+
+
+HOST = "127.0.0.1"
+PORT = 8844
+
+
+def get_config(item: str, default, func=None, conf: dict = {}):
+    if item in conf:
+        if func:
+            return func(conf[item])
+        return conf[item]
+    return default
 
 
 def plot_evolution(rewards: list, pack_size: int, game_name: str):
@@ -18,9 +31,7 @@ def plot_evolution(rewards: list, pack_size: int, game_name: str):
     plt.show()
 
 
-def get_config(item: str, default, func=None, conf: dict = {}):
-    if item in conf:
-        if func:
-            return func(conf[item])
-        return conf[item]
-    return default
+def socket_send(data):
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.connect((HOST, PORT))
+        s.sendall(data.encode())

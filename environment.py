@@ -26,7 +26,9 @@ class Environment:
     def step(self, action: int, state: tuple):
 
         theta, vel = self.actions[action]  # utiliza o index da ação selecionada para identificar ângulo e velocidade
-        d = 2 * vel ** 2 * np.sin(2 * theta) / 9.81  # calcula ponto final apos o lancamento com parâmetros selecionados
+        d = (
+            2 * vel ** 2 * np.sin(np.deg2rad(2 * theta)) / 9.81
+        )  # calcula ponto final apos o lancamento com parâmetros selecionados
 
         dist, target_len = state  # distância do alvo
         err = abs(dist - d)  # distância entre o alvo e o ponto atingido (erro)

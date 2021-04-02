@@ -5,16 +5,17 @@ import json
 
 from agent import Agent
 from environment import Environment
-from utils import plot_evolution
+from utils import plot_evolution, socket_send
 
 import numpy as np
 import tensorflow.compat.v1 as tf
 
 from tqdm import tqdm
 from datetime import datetime
+from typing import Dict, Any, Union
 
-env_settings = {
-    "theta_disc": 80,  # número de pontos de discretização do ângulo de lancamento
+env_settings: Dict[str, Union[int, str]] = {
+    "theta_disc": 91,  # número de pontos de discretização do ângulo de lancamento
     "vel_disc": 100,  # número de pontos de dicretização da velocidade de lancamento
     "max_dist": 50,  # máxima distancia possivel para o alvo
     "target_len": "random",  # comprimento do alvo, isto e, tolerância absoluta para sucesso
@@ -22,14 +23,14 @@ env_settings = {
 
 n_states = 2
 
-n_episodes = 6000  # número de episodios a serem executados
-decay = 0.01  # decaimento da taxa de aleatoriedade
+n_episodes = 1000  # número de episodios a serem executados
+decay = 0.021  # decaimento da taxa de aleatoriedade
 
-agent_settings = {
+agent_settings: Dict[str, int] = {
     "num_states": 2,  # número de parâmetros de um estado = (distancia)
     "gamma": 0,  # incremento por ações futuras
-    "min_experiences": 300,  # mínimo de experiências aleatórias
-    "max_experiences": 10000,  # máximo de experiências aleatórias
+    "min_experiences": 0,  # mínimo de experiências aleatórias
+    "max_experiences": 500,  # máximo de experiências aleatórias
     "batch_size": 0,  # tamanho do pacote aleatório a ser treinado em cada episódio
 }
 
@@ -39,7 +40,7 @@ max_eps = 1  # máxima taxa de aleatoriedade
 verbose = 0  # tipo de output visível após a execução
 pack_size = 5  # números de episódios considerados em cada média no plot resultante
 
-data = {
+data: Dict[str, Any] = {
     "agent_settings": agent_settings,
     "env_settings": env_settings,
     "training_settings": {"n_states": n_states, "n_episodes": n_episodes, "min_eps": min_eps, "max_eps": max_eps, "decay": decay},
@@ -64,6 +65,15 @@ with tf.Session() as sess:
 
         state = env.reset()  # gera um novo ambiente = novo alvo
         action = agent.choose_action(state, eps)  # toma uma ação dado o ambiente
+
+        if False:  # i % 10 == 0:
+            try:
+                theta, vel = env.actions[action]
+                values = json.dumps((theta, vel, state[0], state[1]))
+                socket_send(values)
+            except Exception:
+                pass
+
         reward, next_state = env.step(action, state)  # calcula os efeitos da ação tomada
         agent.add_experience(state, action, reward, next_state)  # absorve a experiência obtida
         agent.train()  # treino
@@ -77,13 +87,15 @@ with tf.Session() as sess:
     print("Total reward:", sum(agent.rewards))
     print("Total training time:", data["results"]["training_time"], "s")
 
+    #     socket_send('end')
+
     # saver.save(sess, 'data/test_session')
 
     plot_evolution(agent.rewards, pack_size, "Treino")
 
     print("\nTesting.\n")
 
-    n_episodes = 1000
+    n_episodes = 100
 
     rewards = []
 
@@ -96,10 +108,10 @@ with tf.Session() as sess:
     data["results"]["testing_rewards"] = rewards
     data["date"] = datetime.today().isoformat()
 
-    if "data" not in os.listdir("./"):
-        os.mkdir("./data")
+    if "data" not in os.listdir():
+        os.mkdir("data")
     filename = re.sub(r"[\-\:\.]", "", data["date"])
-    with open(f"./data/{filename}.json", "w") as f:
+    with open(f"data/{filename}.json", "w") as f:
         json.dump(data, f)
 
     plot_evolution(rewards, pack_size, "Teste")
