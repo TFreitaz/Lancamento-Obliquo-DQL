@@ -36,6 +36,8 @@ class Agent:
 
         fc1 = tf.layers.dense(self.states_ph, 16, activation=tf.nn.relu)  # primeira camada da rede
         fc2 = tf.layers.dense(fc1, 32, activation=tf.nn.relu)  # segunda camada da rede
+        fc3 = tf.layers.dense(fc2, 64, activation=tf.nn.relu)
+        fc4 = tf.layers.dense(fc3, 32, activation=tf.nn.relu)
         self.Q_predicted = tf.layers.dense(fc2, self.num_actions, activation=None)  # camada de saída da rede
         vet_Q_predicted = self.Q_predicted[tf.one_hot(self.actions_ph, self.num_actions, on_value=True, off_value=False)]  # (?)
 

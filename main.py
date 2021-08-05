@@ -15,36 +15,37 @@ from datetime import datetime
 from typing import Dict, Any, Union
 
 env_settings: Dict[str, Union[int, str]] = {
-    "theta_disc": 91,  # número de pontos de discretização do ângulo de lancamento
-    "vel_disc": 100,  # número de pontos de dicretização da velocidade de lancamento
-    "max_dist": 50,  # máxima distancia possivel para o alvo
+    "theta_disc": 10,  # número de pontos de discretização do ângulo de lancamento
+    "vel_disc": 47,  # número de pontos de dicretização da velocidade de lancamento
+    "max_dist": 96,  # máxima distancia possivel para o alvo
     "target_len": "random",  # comprimento do alvo, isto e, tolerância absoluta para sucesso
     "diameter": "random",  # diâmetro do projétil
 }
 
 n_states = 3
 
-n_episodes = 1000  # número de episodios a serem executados
-decay = 0.021  # decaimento da taxa de aleatoriedade
+n_episodes = 30000  # número de episodios a serem executados
+decay = 0.037851  # decaimento da taxa de aleatoriedade
 
 agent_settings: Dict[str, int] = {
     "num_states": n_states,  # número de parâmetros de um estado = (distancia)
     "gamma": 0,  # incremento por ações futuras
-    "min_experiences": 0,  # mínimo de experiências aleatórias
-    "max_experiences": 500,  # máximo de experiências aleatórias
+    "min_experiences": 716,  # mínimo de experiências aleatórias
+    "max_experiences": 6715,  # máximo de experiências aleatórias
     "batch_size": 0,  # tamanho do pacote aleatório a ser treinado em cada episódio
 }
 
 total_reward = 0  # recompensa total
-min_eps = 0.01  # mínima taxa de aleatoriedade
-max_eps = 1  # máxima taxa de aleatoriedade
+min_eps = 0.126184  # mínima taxa de aleatoriedade
+max_eps = 0.531680  # máxima taxa de aleatoriedade
 verbose = 0  # tipo de output visível após a execução
-pack_size = 5  # números de episódios considerados em cada média no plot resultante
+pack_size = 20  # números de episódios considerados em cada média no plot resultante
 
 data: Dict[str, Any] = {
     "agent_settings": agent_settings,
     "env_settings": env_settings,
     "training_settings": {"n_states": n_states, "n_episodes": n_episodes, "min_eps": min_eps, "max_eps": max_eps, "decay": decay},
+    "version": "3.1.2-otimo3",
 }
 
 env = Environment(**env_settings)  # ambiente configurado com parâmetros definidos
@@ -59,7 +60,7 @@ with tf.Session() as sess:
     if verbose == 0:
         all_episodes = tqdm(all_episodes)  # barra de progressão por episódios
 
-    start_training = time.time()
+    start_training = time.time()  # Iniciando contagem de tempo
 
     for i in all_episodes:
         eps = min_eps + (max_eps - min_eps) * np.exp(-decay * i)  # cálculo da taxa de aleatoriedade
@@ -67,6 +68,7 @@ with tf.Session() as sess:
         state = env.reset()  # gera um novo ambiente = novo alvo
         action = agent.choose_action(state, eps)  # toma uma ação dado o ambiente
 
+        # Sinal para representação gráfica do lançamento
         if False:  # i % 10 == 0:
             try:
                 theta, vel = env.actions[action]
@@ -96,7 +98,7 @@ with tf.Session() as sess:
 
     print("\nTesting.\n")
 
-    n_episodes = 100
+    n_episodes = 1000
 
     rewards = []
 
